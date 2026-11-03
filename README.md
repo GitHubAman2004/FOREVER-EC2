@@ -49,7 +49,7 @@ Trade-off: we now look after the server ourselves (updates, restarts, security).
 | 1 | Launched EC2 instance `i-049d820a77b433ca6`, region **ap-south-1 (Mumbai)**, `t3.micro`, Ubuntu | ✅ | `t3.micro` is free-tier eligible. Mumbai is the closest region, for low latency |
 | 2 | Security group `launch-wizard-1`: SSH from *My IP* only; HTTP + HTTPS from anywhere; port 4000 **closed** | ✅ | SSH open to the world invites login attacks. Visitors need 80/443. Node stays private behind Nginx |
 | 3 | Allocated **Elastic IP `13.207.220.194`** and associated it with the instance | ✅ | the normal public IP changes on every stop/start, and a fixed one is needed for Atlas, DuckDNS and the frontend |
-| 4 | SSH rule for **EC2 Instance Connect** (`com.amazonaws.ap-south-1.ec2-instance-connect`) | ⏳ | college and hostel wifi have different IPs, so *My IP* breaks when moving. The browser terminal works from any network, even if port 22 is blocked |
+| 4 | SSH rule for **EC2 Instance Connect**: prefix list `com.amazonaws.ap-south-1.ec2-instance-connect` (`pl-0fa83cebf909345ca`), description "browser terminal". Security group now has 4 inbound rules | ✅ | college and hostel wifi have different IPs, so *My IP* breaks when moving. The browser terminal works from any network, even if port 22 is blocked |
 | 5 | Log in + `sudo apt update && sudo apt upgrade -y` | ⏳ | install security fixes first |
 | 6 | Install Node 22, git, Nginx, PM2, 1 GB swap | ⬜ | swap = disk used as spare RAM, since t3.micro has only 1 GB |
 | 7 | `git clone` this repo on the server, `npm ci --omit=dev` in `backend` | ⬜ | `--omit=dev` skips test-only packages |
@@ -64,6 +64,9 @@ Trade-off: we now look after the server ourselves (updates, restarts, security).
 
 - The **Associate this Elastic IP address** button only shows in the green banner right after allocating. If the banner is closed, tick the IP's checkbox → **Actions → Associate Elastic IP address**.
 - *My IP* in a security group is your IP **at that moment**. On college/hostel wifi it changes, so use the browser terminal or edit the rule again.
+- When adding the prefix-list rule, type into the small 🔍 **Source** box inside the rule row, not the big AWS search bar at the top of the page (that one searches all of AWS and changes nothing).
+- The Source dropdown offers two prefix lists: pick the plain `...ap-south-1.ec2-instance-connect` (IPv4), not the `...ipv6...` one. The server only has an IPv4 address.
+- The AWS "0.0.0.0/0" warning on HTTP/HTTPS is expected for a public website. It would only be a problem on SSH.
 - Release the Elastic IP if the instance is ever deleted, otherwise it keeps costing money (about US$3–4/month).
 
 ## Project layout
