@@ -1,4 +1,6 @@
-# FOREVER-2FA
+# FOREVER-EC2
+
+AWS EC2 version of [FOREVER-2FA](https://github.com/GitHubAman2004/FOREVER-2FA) (which stays on Render). Deployment steps: [DEPLOY-EC2.md](DEPLOY-EC2.md).
 
 Forever e-commerce store (customer site, admin panel and Node/Express backend) with two-factor login: after the password is checked, a 6 digit code is emailed to the user and must be entered to finish signing in.
 

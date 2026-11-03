@@ -1,6 +1,6 @@
-# Moving the backend from Render to AWS EC2
+# Running the backend on AWS EC2
 
-This guide moves the Express backend (`backend/`) to an AWS EC2 server. The frontend and admin panel stay on Vercel; only their `VITE_BACKEND_URL` changes.
+This repo (`FOREVER-EC2`) is the AWS copy of the project. The original `FOREVER-2FA` repo keeps running on Render + Vercel, untouched. This guide puts the Express backend (`backend/`) on an AWS EC2 server, and the frontend and admin panel get their own Vercel projects pointing at it.
 
 ```
 Browser ──HTTPS──▶ Vercel (frontend, admin)
@@ -119,13 +119,13 @@ Check: `node -v` shows `v22...`, `nginx -v` shows a version.
 ## Step 5: Get the code and install packages
 
 ```bash
-cd ~ && git clone https://github.com/GitHubAman2004/FOREVER-2FA.git
+cd ~ && git clone https://github.com/GitHubAman2004/FOREVER-EC2.git
 ```
 
 (If the repo is private, GitHub asks for a username and a **personal access token** instead of a password.)
 
 ```bash
-cd ~/FOREVER-2FA/backend && npm ci --omit=dev
+cd ~/FOREVER-EC2/backend && npm ci --omit=dev
 ```
 
 `npm ci` installs the exact versions from `package-lock.json`; `--omit=dev` skips test-only packages like vitest.
@@ -208,7 +208,7 @@ Useful PM2 commands:
 ## Step 10: Put Nginx in front
 
 ```bash
-sudo cp ~/FOREVER-2FA/deploy/nginx-forever-api.conf /etc/nginx/sites-available/forever-api
+sudo cp ~/FOREVER-EC2/deploy/nginx-forever-api.conf /etc/nginx/sites-available/forever-api
 ```
 
 ```bash
@@ -244,26 +244,36 @@ Your frontend is `https://...vercel.app`. Browsers block an HTTPS page from call
 
 Open `https://forever-api.duckdns.org/`: **API Working** with a padlock. (If you own a real domain, add an **A record** pointing to `YOUR_IP` and use that instead.)
 
-## Step 12: Point the frontend and admin at EC2
+## Step 12: New Vercel projects for the frontend and admin
 
-Vercel → each project (frontend and admin) → **Settings → Environment Variables** → set
+Don't edit the existing Vercel projects: they belong to the Render version (`FOREVER-2FA`), and changing them would move the live site. Create two **new** projects from this repo instead:
 
-```
-VITE_BACKEND_URL=https://forever-api.duckdns.org
-```
-
-then **Deployments → ⋯ → Redeploy**. Vite copies `VITE_` variables into the JavaScript at **build** time, so changing the value without redeploying does nothing.
+1. Vercel → **Add New → Project** → import `GitHubAman2004/FOREVER-EC2`.
+2. **Root Directory:** `frontend` (for the second project: `admin`).
+3. **Environment Variables:**
+   ```
+   VITE_BACKEND_URL=https://forever-api.duckdns.org
+   ```
+   The frontend also needs `VITE_RAZORPAY_KEY_ID` (same value as the old project).
+4. **Deploy.** Vite copies `VITE_` variables into the JavaScript at **build** time, so if you change one later, **Redeploy**.
 
 Now test on the live site: sign up, log in (2FA code arrives), add to cart, place an order, use the chatbot, and add a product from the admin panel.
 
-## Step 13: Turn off Render
+## Step 13: Two independent copies
 
-Once everything works for a day or two, suspend or delete the Render service so there aren't two backends.
+| | Render version | AWS version |
+|---|---|---|
+| Repo | `FOREVER-2FA` | `FOREVER-EC2` |
+| Backend | Render | EC2 (`13.207.220.194`) |
+| Frontend/admin | existing Vercel projects | new Vercel projects |
+| Database | MongoDB Atlas | the same Atlas database (or a new one, see below) |
+
+Both backends can use the same `MONGODB_URI`, so products, users and orders are shared. If you want the AWS copy completely separate, create a second database in Atlas and use its URI in the EC2 `.env`.
 
 ## Updating the backend later
 
 ```bash
-cd ~/FOREVER-2FA && git pull && cd backend && npm ci --omit=dev && pm2 restart forever-backend
+cd ~/FOREVER-EC2 && git pull && cd backend && npm ci --omit=dev && pm2 restart forever-backend
 ```
 
 ## When something breaks
