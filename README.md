@@ -4,6 +4,8 @@ Forever e-commerce store (customer site, admin panel and Node/Express backend) w
 
 📘 **New here or debugging login/email?** Read [LEARNING-NOTES.md](LEARNING-NOTES.md). It walks through every problem we hit getting 2FA working on the live site, how each was fixed, and where every setting lives.
 
+☁️ **Hosting the backend on AWS EC2?** Follow [DEPLOY-EC2.md](DEPLOY-EC2.md) (Ubuntu + Nginx + PM2 + HTTPS).
+
 ## Project layout
 
 - `frontend` - customer website (React + Vite)
