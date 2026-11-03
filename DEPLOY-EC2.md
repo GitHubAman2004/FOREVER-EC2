@@ -46,7 +46,23 @@ Browser ──HTTPS──▶ Vercel (frontend, admin)
 6. **Storage:** 15 GiB gp3 is comfortable (the free tier allows up to 30 GiB).
 7. Click **Launch instance**.
 
-> If your home IP changes later and SSH stops working, edit the security group's SSH rule and pick *My IP* again.
+> If your IP changes later and SSH stops working, edit the security group's SSH rule and pick *My IP* again. If you move between networks a lot, see the next section.
+
+### If your IP keeps changing (college / hostel wifi)
+
+*My IP* allows only the address you have **right now**. College wifi and hostel wifi have different addresses, so SSH from your laptop stops working when you move. Some college networks also block port 22 entirely.
+
+**Fix: add a second SSH rule for the AWS browser terminal.** It works from any network, because your browser talks to AWS over normal HTTPS (port 443) and AWS connects to the server for you.
+
+EC2 → **Security Groups** → `launch-wizard-1` → **Edit inbound rules** → **Add rule**:
+
+| Type | Source | Description |
+|---|---|---|
+| SSH | Custom → type `ec2-instance-connect` and pick **com.amazonaws.ap-south-1.ec2-instance-connect** (a prefix list: AWS's own addresses for this service in Mumbai) | AWS browser terminal |
+
+Keep the existing *My IP* rule for your laptop terminal. Then, from anywhere: EC2 → Instances → select `forever-backend` → **Connect** → **EC2 Instance Connect** tab → username `ubuntu` → **Connect**. A terminal opens in the browser tab, and every command in this guide works there.
+
+When you want your laptop terminal again on a new network, edit the *My IP* rule and pick *My IP* again (takes 30 seconds). Delete old IPs you no longer use instead of piling up rules.
 
 ## Step 2: Give it a fixed IP (Elastic IP)
 
