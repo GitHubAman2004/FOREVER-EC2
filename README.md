@@ -8,6 +8,8 @@ Forever e-commerce store (customer site, admin panel and Node/Express backend) w
 
 ☁️ **Hosting the backend on AWS EC2?** Follow [DEPLOY-EC2.md](DEPLOY-EC2.md) (Ubuntu + Nginx + PM2 + HTTPS).
 
+🎓 **Resume bullet explained line by line (for interviews):** [RESUME-BULLET-EXPLAINED.md](RESUME-BULLET-EXPLAINED.md)
+
 ## 📓 AWS deployment journal
 
 What happened while moving this project to AWS, in order, and **why** each thing was done. Read this to remember the decisions later. The full commands are in [DEPLOY-EC2.md](DEPLOY-EC2.md).
